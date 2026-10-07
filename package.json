@@ -1,12 +1,15 @@
 {
-  "name": "threatlens-server",
+  "name": "threatlens",
   "version": "1.0.0",
-  "description": "ThreatLens AI-Assisted Threat Intelligence Backend",
-  "main": "src/index.js",
   "type": "module",
+  "description": "ThreatLens - AI-Assisted Phishing Detection and Threat Intelligence Platform",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "node run-dev.js",
+    "start": "node server/src/index.js"
   },
   "dependencies": {
     "axios": "^1.7.9",
@@ -17,5 +20,6 @@
     "libphonenumber-js": "^1.11.17",
     "sqlite3": "^5.1.7",
     "validator": "^13.12.0"
-  }
+  },
+  "keywords": ["threat-intelligence", "phishing-detector", "security", "threatlens"]
 }

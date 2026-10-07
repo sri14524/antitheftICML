@@ -408,6 +408,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`[ThreatLens] Engine listening on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`[ThreatLens] Engine listening on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
+

@@ -7,6 +7,7 @@ import TrustScoreCard from './components/TrustScoreCard';
 import EngineMatrix from './components/EngineMatrix';
 import DeepSignalsCard from './components/DeepSignalsCard';
 import ScanHistory from './components/ScanHistory';
+import { apiFetch } from './utils/api';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -34,30 +35,23 @@ export default function App() {
   const fetchTelemetry = async () => {
     try {
       const [healthRes, summaryRes, agreeRes] = await Promise.allSettled([
-        fetch('/api/health'),
-        fetch('/api/stats/summary'),
-        fetch('/api/stats/agreement'),
+        apiFetch('/api/health'),
+        apiFetch('/api/stats/summary'),
+        apiFetch('/api/stats/agreement'),
       ]);
 
-      if (healthRes.status === 'fulfilled' && healthRes.value.ok) {
-        const healthData = await healthRes.value.json();
-        setBackendStatus(healthData.status === 'online' ? 'online' : 'error');
+      if (healthRes.status === 'fulfilled' && healthRes.value?.status === 'online') {
+        setBackendStatus('online');
       } else {
         setBackendStatus('offline');
       }
 
-      if (summaryRes.status === 'fulfilled' && summaryRes.value.ok) {
-        const summaryData = await summaryRes.value.json();
-        if (summaryData.success) {
-          setPlatformStats(summaryData.stats);
-        }
+      if (summaryRes.status === 'fulfilled' && summaryRes.value?.success) {
+        setPlatformStats(summaryRes.value.stats);
       }
 
-      if (agreeRes.status === 'fulfilled' && agreeRes.value.ok) {
-        const agreeData = await agreeRes.value.json();
-        if (agreeData.success) {
-          setAgreementStats(agreeData.stats);
-        }
+      if (agreeRes.status === 'fulfilled' && agreeRes.value?.success) {
+        setAgreementStats(agreeRes.value.stats);
       }
     } catch {
       setBackendStatus('offline');
@@ -76,15 +70,14 @@ export default function App() {
     setErrorMsg(null);
 
     try {
-      const res = await fetch('/api/scan', {
+      const data = await apiFetch('/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input, type, defaultCountry }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to complete threat analysis scan.');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to complete threat analysis scan.');
       }
 
       // Normalize scan dossier structure

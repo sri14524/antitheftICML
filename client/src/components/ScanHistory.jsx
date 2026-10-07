@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../utils/api';
 import {
   Database,
   Search,
@@ -36,9 +37,8 @@ export default function ScanHistory({ onSelectScan, onHistoryUpdated }) {
       if (typeFilter !== 'all') params.append('type', typeFilter);
       params.append('limit', '60');
 
-      const res = await fetch(`/api/scans?${params.toString()}`);
-      const data = await res.json();
-      if (data.success) {
+      const data = await apiFetch(`/api/scans?${params.toString()}`);
+      if (data?.success) {
         setScans(data.scans || []);
       }
     } catch (err) {
@@ -58,7 +58,7 @@ export default function ScanHistory({ onSelectScan, onHistoryUpdated }) {
     }
     setIsClearing(true);
     try {
-      await fetch('/api/scans', { method: 'DELETE' });
+      await apiFetch('/api/scans', { method: 'DELETE' });
       await fetchHistory();
       if (onHistoryUpdated) onHistoryUpdated();
     } catch (err) {
